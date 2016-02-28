@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/new/icon">
+        <file>icon/controler.ico</file>
+    </qresource>
+    <qresource prefix="/new/pic">
+        <file>pic/control.png</file>
+    </qresource>
+</RCC>
