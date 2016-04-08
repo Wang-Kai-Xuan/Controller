@@ -24,19 +24,55 @@ public:
     QPushButton * curtain_btn;
     QPushButton * close_btn;
 public:
+    /**
+     * @brief newUI
+     * new 新控件
+     */
     void newUI();
+    /**
+     * @brief setUI
+     * 设置UI
+     */
     void setUI();
+    /**
+     * @brief setConnect
+     * 连接信号和槽
+     */
     void setConnect();
+    /**
+     * @brief init
+     * 初始化
+     */
     void init();
 public:
     QUdpSocket * udpSocket;
+    /**
+     * @brief sendData
+     * 保存发送的数据
+     */
     QByteArray sendData;
+    /**
+     * @brief recvData
+     * 保存接收到的数据
+     */
     QByteArray recvData;
 signals:
 
 public slots:
+    /**
+     * @brief onControlLight
+     * 控制电灯的开关
+     */
     void onControlLight(void);
+    /**
+     * @brief onControlCurtain
+     * 控制窗帘的拉开、合上
+     */
     void onControlCurtain(void);
+    /**
+     * @brief onReadMessage
+     * 读取消息
+     */
     void onReadMessage(void);
 };
 

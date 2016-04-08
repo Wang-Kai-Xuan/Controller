@@ -33,7 +33,6 @@ void Control::setUI()
     this->setWindowIcon(QIcon(":/new/pic/pic/control.png"));
     this->resize(300,400);
     this->setWindowTitle(tr("控制台"));
-//    this->setStyleSheet("color:red");
 }
 
 void Control::setConnect()
@@ -100,6 +99,4 @@ Control::Control(QWidget *parent) : QWidget(parent)
     setUI();
     setConnect();
     init();
-//    QTextCodec code;
-//    qDebug()<<"code="<<code.name();
 }
