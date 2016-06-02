@@ -6,9 +6,12 @@ void Control::newUI()
     light_btn = new QPushButton(tr("打开(&L)"));
     curtain_btn = new QPushButton(tr("打开(&C)"));
     close_btn = new QPushButton(tr("退出(&E)"));
+    clear_msg = new QPushButton(tr("清除(&L)"));
     light_lab = new ILabel;
+    lab_ip = new ILabel;
     curtain_lab = new ILabel;
     udpSocket = new QUdpSocket;
+    show_msg = new QTextEdit;
 }
 
 void Control::setUI()
@@ -16,18 +19,14 @@ void Control::setUI()
     light_lab->setText(tr("电灯开关:"));
     curtain_lab->setText(tr("窗帘开关:"));
 
-    /*这些配置在Android上显示不完美*/
-//    light_btn->setFixedSize(120,40);
-//    light_lab->setFixedSize(120,40);
-//    curtain_btn->setFixedSize(120,40);
-//    curtain_lab->setFixedSize(120,40);
-//    close_btn->setFixedSize(120,40);
-
     main_glay->addWidget(light_lab,0,0,1,1);
     main_glay->addWidget(light_btn,0,1,1,1);
     main_glay->addWidget(curtain_lab,1,0,1,1);
     main_glay->addWidget(curtain_btn,1,1,1,1);
-    main_glay->addWidget(close_btn,2,0,1,1);
+    main_glay->addWidget(lab_ip,2,0,1,1);
+    main_glay->addWidget(close_btn,2,1,1,1);
+    main_glay->addWidget(clear_msg,3,1,1,1);
+    main_glay->addWidget(show_msg,4,0,1,2);
 
     this->setLayout(main_glay);
     this->setWindowIcon(QIcon(":/new/pic/pic/control.png"));
@@ -39,15 +38,19 @@ void Control::setConnect()
 {
     connect(close_btn,SIGNAL(clicked(bool)),this,SLOT(close()));
     connect(light_btn,SIGNAL(clicked(bool)),this,SLOT(onControlLight()));
+    connect(clear_msg,SIGNAL(clicked(bool)),this,SLOT(onClearMessage()));
     connect(curtain_btn,SIGNAL(clicked(bool)),this,SLOT(onControlCurtain()));
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onReadMessage()));
 }
 
 void Control::init()
 {
-    if(!udpSocket->bind(iport,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint)){
+//    if(!udpSocket->bind(iport,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint)){
+    if(!udpSocket->bind(iport)){
         qDebug()<<"绑定端口失败";
     }
+
+    lab_ip->setText(getLocalIP());
 }
 
 void Control::onControlLight()
@@ -63,7 +66,6 @@ void Control::onControlLight()
         sendData.append(COMMAND_NULL);
     }
     udpSocket->writeDatagram(sendData.data(),sendData.size(),QHostAddress::Broadcast,iport);
-    qDebug()<<"sendData="<<sendData;
 }
 
 void Control::onControlCurtain()
@@ -80,7 +82,10 @@ void Control::onControlCurtain()
         sendData.append(COMMAND_NULL);
     }
     udpSocket->writeDatagram(sendData.data(),sendData.size(),QHostAddress::Broadcast,iport);
-    qDebug()<<"sendData="<<sendData;
+}
+void Control::onClearMessage()
+{
+    show_msg->clear();
 }
 
 void Control::onReadMessage()
@@ -90,7 +95,7 @@ void Control::onReadMessage()
         recvData.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(recvData.data(),recvData.size());
     }
-    qDebug()<<"recvData="<<recvData;
+        show_msg->append(recvData);
 }
 
 Control::Control(QWidget *parent) : QWidget(parent)
@@ -99,4 +104,15 @@ Control::Control(QWidget *parent) : QWidget(parent)
     setUI();
     setConnect();
     init();
+}
+
+QString Control::getLocalIP()
+{
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    foreach(QHostAddress address,list){
+        if(address.protocol() == QAbstractSocket::IPv4Protocol){
+            return address.toString();
+        }
+    }
+    return 0;
 }

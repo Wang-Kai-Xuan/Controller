@@ -10,6 +10,7 @@
 #include <QUdpSocket>
 #include <QHostAddress>
 #include <QNetworkInterface>
+#include <QTextEdit>
 #include "common.h"
 class Control : public QWidget
 {
@@ -20,9 +21,12 @@ public:
     QGridLayout * main_glay;
     ILabel * light_lab;
     ILabel * curtain_lab;
+    ILabel * lab_ip;
     QPushButton * light_btn;
     QPushButton * curtain_btn;
     QPushButton * close_btn;
+    QPushButton * clear_msg;
+    QTextEdit * show_msg;
 public:
     /**
      * @brief newUI
@@ -56,6 +60,7 @@ public:
      * 保存接收到的数据
      */
     QByteArray recvData;
+    QString getLocalIP();
 signals:
 
 public slots:
@@ -74,6 +79,7 @@ public slots:
      * 读取消息
      */
     void onReadMessage(void);
+    void onClearMessage();
 };
 
 #endif // ChatBase_H
