@@ -1,34 +1,34 @@
 #include "control.h"
 #include <QTextCodec>
-void Control::newUI()
+void Control::newComponent()
 {
-    main_glay = new QGridLayout;
-    light_btn = new QPushButton(tr("打开(&L)"));
-    curtain_btn = new QPushButton(tr("打开(&C)"));
-    close_btn = new QPushButton(tr("退出(&E)"));
-    clear_msg = new QPushButton(tr("清除(&L)"));
-    light_lab = new ILabel;
-    lab_ip = new ILabel;
-    curtain_lab = new ILabel;
+    layout_pc = new QGridLayout;
+    btn_light = new QPushButton(tr("打开(&L)"));
+    btn_curtain = new QPushButton(tr("打开(&C)"));
+    btn_close = new QPushButton(tr("退出(&E)"));
+    btn_clear = new QPushButton(tr("清除(&F)"));
+    lab_light = new QLabel("电灯开关:");
+    lab_ip = new QLabel;
+    lab_curtain = new QLabel("窗帘开关:");
     udpSocket = new QUdpSocket;
-    show_msg = new QTextEdit;
+    text_show_msg = new QTextEdit;
 }
 
-void Control::setUI()
+void Control::pcLayout()
 {
-    light_lab->setText(tr("电灯开关:"));
-    curtain_lab->setText(tr("窗帘开关:"));
+    layout_pc->addWidget(lab_ip,0,0,1,1);
+    layout_pc->addWidget(btn_close,1,0,1,1);
+    layout_pc->addWidget(btn_clear,1,1,1,1);
+    layout_pc->addWidget(lab_light,2,0,1,1);
+    layout_pc->addWidget(btn_light,2,1,1,1);
+    layout_pc->addWidget(lab_curtain,3,0,1,1);
+    layout_pc->addWidget(btn_curtain,3,1,1,1);
+    layout_pc->addWidget(text_show_msg,4,0,1,2);
+}
 
-    main_glay->addWidget(light_lab,0,0,1,1);
-    main_glay->addWidget(light_btn,0,1,1,1);
-    main_glay->addWidget(curtain_lab,1,0,1,1);
-    main_glay->addWidget(curtain_btn,1,1,1,1);
-    main_glay->addWidget(lab_ip,2,0,1,1);
-    main_glay->addWidget(close_btn,2,1,1,1);
-    main_glay->addWidget(clear_msg,3,1,1,1);
-    main_glay->addWidget(show_msg,4,0,1,2);
-
-    this->setLayout(main_glay);
+void Control::setComponent(){
+    pcLayout();
+    this->setLayout(layout_pc);
     this->setWindowIcon(QIcon(":/new/pic/pic/control.png"));
     this->resize(300,400);
     this->setWindowTitle(tr("控制台"));
@@ -36,34 +36,34 @@ void Control::setUI()
 
 void Control::setConnect()
 {
-    connect(close_btn,SIGNAL(clicked(bool)),this,SLOT(close()));
-    connect(light_btn,SIGNAL(clicked(bool)),this,SLOT(onControlLight()));
-    connect(clear_msg,SIGNAL(clicked(bool)),this,SLOT(onClearMessage()));
-    connect(curtain_btn,SIGNAL(clicked(bool)),this,SLOT(onControlCurtain()));
+    connect(btn_close,SIGNAL(clicked(bool)),this,SLOT(close()));
+    connect(btn_light,SIGNAL(clicked(bool)),this,SLOT(onControlLight()));
+    connect(btn_clear,SIGNAL(clicked(bool)),this,SLOT(onClearMessage()));
+    connect(btn_curtain,SIGNAL(clicked(bool)),this,SLOT(onControlCurtain()));
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onReadMessage()));
 }
 
-void Control::init()
-{
-//    if(!udpSocket->bind(iport,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint)){
-    if(!udpSocket->bind(iport)){
+void Control::init(){
+    if(!udpSocket->bind(iport,QAbstractSocket::ShareAddress)){
         qDebug()<<"绑定端口失败";
     }
+    lab_ip->setText(QString("网络地址:")+getLocalIP());
+    context.insert(LIGHT_OPEN, QString("电灯打开"));
+    context.insert(LIGHT_CLOSE, QString("电灯关闭"));
+    context.insert(CURTAIN_OPEN, QString("窗帘打开"));
+    context.insert(CURTAIN_CLOSE, QString("窗帘关闭"));
 
-    lab_ip->setText(getLocalIP());
 }
 
 void Control::onControlLight()
 {
     sendData.clear();
-    if(light_btn->text() == tr("打开(&L)")){
-        light_btn->setText(tr("关闭(&L)"));
+    if(btn_light->text() == tr("打开(&L)")){
+        btn_light->setText(tr("关闭(&L)"));
         sendData.append(LIGHT_OPEN);
-        sendData.append(COMMAND_NULL);
     }else{
-        light_btn->setText(tr("打开(&L)"));
+        btn_light->setText(tr("打开(&L)"));
         sendData.append(LIGHT_CLOSE);
-        sendData.append(COMMAND_NULL);
     }
     udpSocket->writeDatagram(sendData.data(),sendData.size(),QHostAddress::Broadcast,iport);
 }
@@ -71,47 +71,54 @@ void Control::onControlLight()
 void Control::onControlCurtain()
 {
     sendData.clear();
-    if(curtain_btn->text() == tr("打开(&C)")){
-        curtain_btn->setText(tr("关闭(&C)"));
+    if(btn_curtain->text() == tr("打开(&C)")){
+        btn_curtain->setText(tr("关闭(&C)"));
         sendData.append(CURTAIN_OPEN);
-        sendData.append(COMMAND_NULL);
 
     }else{
-        curtain_btn->setText(tr("打开(&C)"));
+        btn_curtain->setText(tr("打开(&C)"));
         sendData.append(CURTAIN_CLOSE);
-        sendData.append(COMMAND_NULL);
     }
     udpSocket->writeDatagram(sendData.data(),sendData.size(),QHostAddress::Broadcast,iport);
 }
 void Control::onClearMessage()
 {
-    show_msg->clear();
+    text_show_msg->clear();
 }
 
 void Control::onReadMessage()
 {
+    changColor++;
     recvData.clear();
     while(udpSocket->hasPendingDatagrams()){
         recvData.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(recvData.data(),recvData.size());
     }
-        show_msg->append(recvData);
+    text_show_msg->append(context[recvData.toInt()+'0']);
+    if(changColor%2)
+        text_show_msg->setTextColor("red");
+    else
+        text_show_msg->setTextColor("black");
 }
 
 Control::Control(QWidget *parent) : QWidget(parent)
 {
-    newUI();
-    setUI();
-    setConnect();
+    newComponent();
     init();
+    setComponent();
+    setConnect();
 }
 
 QString Control::getLocalIP()
 {
-    QList<QHostAddress> list = QNetworkInterface::allAddresses();
-    foreach(QHostAddress address,list){
-        if(address.protocol() == QAbstractSocket::IPv4Protocol){
-            return address.toString();
+    QList<QHostAddress> ipList = QNetworkInterface::allAddresses();
+    foreach(QHostAddress ipItem, ipList)
+    {
+        //只显示以192开头的IP地址
+        if(ipItem.protocol()==QAbstractSocket::IPv4Protocol&&ipItem!=QHostAddress::Null
+                &&ipItem!=QHostAddress::LocalHost&&ipItem.toString().left(3)=="192")
+        {
+            return ipItem.toString();
         }
     }
     return 0;

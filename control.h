@@ -1,43 +1,35 @@
 #ifndef ChatBase_H
 #define ChatBase_H
 
-#include "ilabel.h"
-#include <QWidget>
-#include <QAbstractSocket>
-#include <QGridLayout>
-#include <QByteArray>
-#include <QPushButton>
-#include <QUdpSocket>
-#include <QHostAddress>
-#include <QNetworkInterface>
-#include <QTextEdit>
-#include "common.h"
+#include "header.h"
 class Control : public QWidget
 {
     Q_OBJECT
 public:
     explicit Control(QWidget *parent = 0);
 public:
-    QGridLayout * main_glay;
-    ILabel * light_lab;
-    ILabel * curtain_lab;
-    ILabel * lab_ip;
-    QPushButton * light_btn;
-    QPushButton * curtain_btn;
-    QPushButton * close_btn;
-    QPushButton * clear_msg;
-    QTextEdit * show_msg;
+    QGridLayout * layout_pc;
+    QLabel * lab_light;
+    QLabel * lab_curtain;
+    QLabel * lab_ip;
+    QPushButton * btn_light;
+    QPushButton * btn_curtain;
+    QPushButton * btn_close;
+    QPushButton * btn_clear;
+    QTextEdit * text_show_msg;
+    qint8 changColor;
+    QMap<int,QString> context;
 public:
     /**
      * @brief newUI
      * new 新控件
      */
-    void newUI();
+    void newComponent();
     /**
      * @brief setUI
      * 设置UI
      */
-    void setUI();
+    void setComponent();
     /**
      * @brief setConnect
      * 连接信号和槽
@@ -61,6 +53,8 @@ public:
      */
     QByteArray recvData;
     QString getLocalIP();
+    void pcLayout();
+    
 signals:
 
 public slots:

@@ -12,13 +12,11 @@ TARGET = Controller
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    ilabel.cpp \
     control.cpp
 
 HEADERS  += \
-    ilabel.h \
     control.h \
-    common.h
+    header.h
 
 CONFIG += mobility
 MOBILITY = 
