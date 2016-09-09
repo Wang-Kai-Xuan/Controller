@@ -7,6 +7,7 @@
 #include <QByteArray>
 #include <QPushButton>
 #include <QUdpSocket>
+#include <QTcpSocket>
 #include <QHostAddress>
 #include <QNetworkInterface>
 #include <QTextEdit>
@@ -14,6 +15,9 @@
 #include <QMap>
 
 #define iport 11080
+#define ip "192.168.0.99"
+#define ip_test "127.0.0.1"
+
 /**
  * @brief The COMMAND enum
  * 用作发送接收数据类的标识

@@ -41,12 +41,12 @@ public:
      */
     void init();
 public:
-    QUdpSocket * udpSocket;
+    QTcpSocket * tcpSocket;
     /**
      * @brief sendData
      * 保存发送的数据
      */
-    QByteArray sendData;
+    QString sendData;
     /**
      * @brief recvData
      * 保存接收到的数据
@@ -73,7 +73,9 @@ public slots:
      * 读取消息
      */
     void onReadMessage(void);
+    void sendMessage(QString str);
     void onClearMessage();
+    void onUpdataConnectStatus();
 };
 
 #endif // ChatBase_H

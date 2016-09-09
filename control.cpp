@@ -1,5 +1,4 @@
 #include "control.h"
-#include <QTextCodec>
 void Control::newComponent()
 {
     layout_pc = new QGridLayout;
@@ -10,7 +9,7 @@ void Control::newComponent()
     lab_light = new QLabel("电灯开关:");
     lab_ip = new QLabel;
     lab_curtain = new QLabel("窗帘开关:");
-    udpSocket = new QUdpSocket;
+    tcpSocket = new QTcpSocket;
     text_show_msg = new QTextEdit;
 }
 
@@ -40,19 +39,17 @@ void Control::setConnect()
     connect(btn_light,SIGNAL(clicked(bool)),this,SLOT(onControlLight()));
     connect(btn_clear,SIGNAL(clicked(bool)),this,SLOT(onClearMessage()));
     connect(btn_curtain,SIGNAL(clicked(bool)),this,SLOT(onControlCurtain()));
-    connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onReadMessage()));
+    connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(onReadMessage()));
+    connect(tcpSocket,SIGNAL(connected()),this,SLOT(onUpdataConnectStatus()));
 }
 
 void Control::init(){
-    if(!udpSocket->bind(iport,QAbstractSocket::ShareAddress)){
-        qDebug()<<"绑定端口失败";
-    }
+    tcpSocket->connectToHost(ip_test,iport);
     lab_ip->setText(QString("网络地址:")+getLocalIP());
     context.insert(LIGHT_OPEN, QString("电灯打开"));
     context.insert(LIGHT_CLOSE, QString("电灯关闭"));
     context.insert(CURTAIN_OPEN, QString("窗帘打开"));
     context.insert(CURTAIN_CLOSE, QString("窗帘关闭"));
-
 }
 
 void Control::onControlLight()
@@ -65,7 +62,7 @@ void Control::onControlLight()
         btn_light->setText(tr("打开(&L)"));
         sendData.append(LIGHT_CLOSE);
     }
-    udpSocket->writeDatagram(sendData.data(),sendData.size(),QHostAddress::Broadcast,iport);
+    sendMessage(sendData);
 }
 
 void Control::onControlCurtain()
@@ -79,26 +76,42 @@ void Control::onControlCurtain()
         btn_curtain->setText(tr("打开(&C)"));
         sendData.append(CURTAIN_CLOSE);
     }
-    udpSocket->writeDatagram(sendData.data(),sendData.size(),QHostAddress::Broadcast,iport);
+    sendMessage(sendData);
 }
 void Control::onClearMessage()
 {
     text_show_msg->clear();
+    QByteArray str = "this is a test string";
+    sendMessage(str);
+}
+
+void Control::onUpdataConnectStatus()
+{
+    text_show_msg->setText("connected!");
 }
 
 void Control::onReadMessage()
 {
     changColor++;
     recvData.clear();
-    while(udpSocket->hasPendingDatagrams()){
-        recvData.resize(udpSocket->pendingDatagramSize());
-        udpSocket->readDatagram(recvData.data(),recvData.size());
-    }
+
     text_show_msg->append(context[recvData.toInt()+'0']);
     if(changColor%2)
         text_show_msg->setTextColor("red");
     else
         text_show_msg->setTextColor("black");
+}
+
+void Control::sendMessage(QString str)
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion (QDataStream::Qt_4_7);
+    out << (quint16) 0;
+    out << str;
+    out.device ()->seek (0);
+    out << (quint16)(block.size() - sizeof(quint16));
+    tcpSocket->write(block);
 }
 
 Control::Control(QWidget *parent) : QWidget(parent)

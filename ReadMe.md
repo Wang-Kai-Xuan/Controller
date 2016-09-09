@@ -1,11 +1,9 @@
-# 项目介绍
-该软件工具是我大学期间的一个项目的上位机控制软件。完成的功能很简单，就是：在局域网内发送广播消息，接收广播消息，然后做相应的操作（比如显示处理）。
+The software is a control terminal of my project during my college.
+### environment
+1. Windows 10( Linux distribution also the same)
+2. Qt5.6 + network module
 
-# 开发环境
-Win10 + Qt5.6（由于Qt的跨平台特性，也可以将项目迁移至Linux等其他环境进行开发）
-
-# 使用的Qt组件
-core + gui + network + sql
-
-# 通信协议
-命令|参数
+### feature
+1. provide the interactive interface with execute layer(hardware layer).
+2. send order foward to the execute layer though the local area network build by WiFi serial port module.
+3. receive data from layer. 
