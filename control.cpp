@@ -1,7 +1,7 @@
 #include "control.h"
 void Control::newComponent()
 {
-    layout_pc = new QGridLayout;
+    layout = new QGridLayout;
     btn_light = new QPushButton(tr("打开(&L)"));
     btn_curtain = new QPushButton(tr("打开(&C)"));
     btn_close = new QPushButton(tr("退出(&E)"));
@@ -13,21 +13,21 @@ void Control::newComponent()
     text_show_msg = new QTextEdit;
 }
 
-void Control::pcLayout()
+void Control::uiLayout()
 {
-    layout_pc->addWidget(lab_ip,0,0,1,1);
-    layout_pc->addWidget(btn_close,1,0,1,1);
-    layout_pc->addWidget(btn_clear,1,1,1,1);
-    layout_pc->addWidget(lab_light,2,0,1,1);
-    layout_pc->addWidget(btn_light,2,1,1,1);
-    layout_pc->addWidget(lab_curtain,3,0,1,1);
-    layout_pc->addWidget(btn_curtain,3,1,1,1);
-    layout_pc->addWidget(text_show_msg,4,0,1,2);
+    layout->addWidget(lab_ip,0,0,1,1);
+    layout->addWidget(btn_close,1,0,1,1);
+    layout->addWidget(btn_clear,1,1,1,1);
+    layout->addWidget(lab_light,2,0,1,1);
+    layout->addWidget(btn_light,2,1,1,1);
+    layout->addWidget(lab_curtain,3,0,1,1);
+    layout->addWidget(btn_curtain,3,1,1,1);
+    layout->addWidget(text_show_msg,4,0,1,2);
 }
 
 void Control::setComponent(){
-    pcLayout();
-    this->setLayout(layout_pc);
+    uiLayout();
+    this->setLayout(layout);
     this->setWindowIcon(QIcon(":/new/pic/pic/control.png"));
     this->resize(300,400);
     this->setWindowTitle(tr("控制台"));

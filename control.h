@@ -8,7 +8,7 @@ class Control : public QWidget
 public:
     explicit Control(QWidget *parent = 0);
 public:
-    QGridLayout * layout_pc;
+    QGridLayout * layout;
     QLabel * lab_light;
     QLabel * lab_curtain;
     QLabel * lab_ip;
@@ -54,7 +54,7 @@ public:
     QByteArray recvData;
 
     QString getLocalIP();
-    void pcLayout();
+    void uiLayout();
     void sendMessage(QString str);
     
 signals:

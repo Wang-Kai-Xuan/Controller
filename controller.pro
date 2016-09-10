@@ -13,12 +13,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     control.cpp \
-    ilabel.cpp
 
 HEADERS  += \
     control.h \
     header.h \
-    ilabel.h
 
 CONFIG += mobility
 MOBILITY = 
