@@ -22,10 +22,8 @@
  * @brief The COMMAND enum
  * 用作发送接收数据类的标识
  */
-enum COMMAND{
+enum Command{
     COMMAND_NULL = '0',LIGHT_OPEN,LIGHT_CLOSE,CURTAIN_OPEN,CURTAIN_CLOSE
 };
-
-
 
 #endif // COMMON

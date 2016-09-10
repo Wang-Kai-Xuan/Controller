@@ -18,7 +18,7 @@ public:
     QPushButton * btn_clear;
     QTextEdit * text_show_msg;
     qint8 changColor;
-    QMap<int,QString> context;
+    QMap<Command,QString> context;
 public:
     /**
      * @brief newUI
@@ -52,8 +52,10 @@ public:
      * 保存接收到的数据
      */
     QByteArray recvData;
+
     QString getLocalIP();
     void pcLayout();
+    void sendMessage(QString str);
     
 signals:
 
@@ -73,7 +75,6 @@ public slots:
      * 读取消息
      */
     void onReadMessage(void);
-    void sendMessage(QString str);
     void onClearMessage();
     void onUpdataConnectStatus();
 };

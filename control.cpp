@@ -44,7 +44,7 @@ void Control::setConnect()
 }
 
 void Control::init(){
-    tcpSocket->connectToHost(ip_test,iport);
+    tcpSocket->connectToHost(ip,iport);
     lab_ip->setText(QString("网络地址:")+getLocalIP());
     context.insert(LIGHT_OPEN, QString("电灯打开"));
     context.insert(LIGHT_CLOSE, QString("电灯关闭"));
@@ -57,32 +57,29 @@ void Control::onControlLight()
     sendData.clear();
     if(btn_light->text() == tr("打开(&L)")){
         btn_light->setText(tr("关闭(&L)"));
-        sendData.append(LIGHT_OPEN);
+        sendData = LIGHT_OPEN;
     }else{
         btn_light->setText(tr("打开(&L)"));
-        sendData.append(LIGHT_CLOSE);
+        sendData = LIGHT_CLOSE;
     }
     sendMessage(sendData);
 }
 
 void Control::onControlCurtain()
 {
-    sendData.clear();
     if(btn_curtain->text() == tr("打开(&C)")){
         btn_curtain->setText(tr("关闭(&C)"));
-        sendData.append(CURTAIN_OPEN);
+        sendData = CURTAIN_OPEN;
 
     }else{
         btn_curtain->setText(tr("打开(&C)"));
-        sendData.append(CURTAIN_CLOSE);
+        sendData = CURTAIN_CLOSE;
     }
     sendMessage(sendData);
 }
 void Control::onClearMessage()
 {
     text_show_msg->clear();
-    QByteArray str = "this is a test string";
-    sendMessage(str);
 }
 
 void Control::onUpdataConnectStatus()
@@ -93,9 +90,9 @@ void Control::onUpdataConnectStatus()
 void Control::onReadMessage()
 {
     changColor++;
-    recvData.clear();
-
-    text_show_msg->append(context[recvData.toInt()+'0']);
+    recvData = tcpSocket->readAll();
+    qDebug()<<"recv="<<recvData;
+    text_show_msg->append(recvData);
     if(changColor%2)
         text_show_msg->setTextColor("red");
     else
@@ -104,14 +101,7 @@ void Control::onReadMessage()
 
 void Control::sendMessage(QString str)
 {
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion (QDataStream::Qt_4_7);
-    out << (quint16) 0;
-    out << str;
-    out.device ()->seek (0);
-    out << (quint16)(block.size() - sizeof(quint16));
-    tcpSocket->write(block);
+    tcpSocket->write(str.toLocal8Bit().constData());
 }
 
 Control::Control(QWidget *parent) : QWidget(parent)
@@ -127,9 +117,8 @@ QString Control::getLocalIP()
     QList<QHostAddress> ipList = QNetworkInterface::allAddresses();
     foreach(QHostAddress ipItem, ipList)
     {
-        //只显示以192开头的IP地址
         if(ipItem.protocol()==QAbstractSocket::IPv4Protocol&&ipItem!=QHostAddress::Null
-                &&ipItem!=QHostAddress::LocalHost&&ipItem.toString().left(3)=="192")
+                &&ipItem!=QHostAddress::LocalHost&&ipItem.toString().left(2)=="19")
         {
             return ipItem.toString();
         }
