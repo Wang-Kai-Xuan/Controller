@@ -33,7 +33,11 @@ DISTFILES += \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
+    android/gradlew.bat \
+    voice.py
 RC_FILE = app.rc
+
+INCLUDEPATH = /usr/include/python2.7/
+LIBS += -lpython2.7
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
